@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendario de Chile</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #667085;
+        --line: #d8dee8;
+        --paper: #f7f3ea;
+        --white: #fffefb;
+        --red: #c52233;
+        --blue: #1f5aa6;
+        --green: #2f7d5b;
+        --gold: #bc7a18;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+      }
+
+      header {
+        background: var(--white);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0 24px;
+      }
+
+      .flag-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        height: 8px;
+        margin-bottom: 22px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .flag-bar span:nth-child(1) {
+        background: var(--blue);
+      }
+      .flag-bar span:nth-child(2) {
+        background: var(--white);
+      }
+      .flag-bar span:nth-child(3) {
+        background: var(--red);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 4.2rem);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        max-width: 720px;
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.55;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      button {
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 700;
+        padding: 0 14px;
+      }
+
+      button:hover,
+      button.active {
+        border-color: var(--blue);
+        background: var(--blue);
+        color: white;
+      }
+
+      main {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 48px;
+      }
+
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .month {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .month h2 {
+        margin: 0;
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 1.2rem;
+        background: #edf4ff;
+      }
+
+      .events {
+        display: grid;
+        gap: 0;
+      }
+
+      .event {
+        display: grid;
+        grid-template-columns: 78px 1fr;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .event:last-child {
+        border-bottom: 0;
+      }
+
+      .day {
+        min-height: 46px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: #f0f6f3;
+        color: var(--green);
+        font-size: 1.35rem;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      .day.variable {
+        font-size: 0.78rem;
+        line-height: 1.1;
+        padding: 0 6px;
+        background: #fff4df;
+        color: var(--gold);
+      }
+
+      .event h3 {
+        margin: 0 0 7px;
+        font-size: 1rem;
+        line-height: 1.25;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .event[data-type*="Feriado"] .badge,
+      .event[data-type*="Fiestas Patrias"] .badge {
+        background: #fff0f1;
+        color: var(--red);
+      }
+
+      .event.irrenunciable {
+        border-left: 4px solid var(--red);
+        background: #fff8f8;
+      }
+
+      .event.irrenunciable .day {
+        background: #fff0f1;
+        color: var(--red);
+      }
+
+      .event.irrenunciable .badge::after {
+        content: "Irrenunciable";
+        margin-left: 6px;
+        padding-left: 6px;
+        border-left: 1px solid currentColor;
+      }
+
+      .note {
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 900px) {
+        .calendar {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .hero {
+          padding-top: 24px;
+        }
+
+        .calendar {
+          grid-template-columns: 1fr;
+        }
+
+        .event {
+          grid-template-columns: 64px 1fr;
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <section class="hero">
+        <div class="flag-bar" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <h1>Calendario de Chile {{ year }}</h1>
+        <p class="subtitle">
+          Fechas importantes de los meses del año: feriados, conmemoraciones,
+          hitos históricos y celebraciones culturales chilenas.
+        </p>
+        <div class="toolbar" aria-label="Filtros de fechas">
+          <button class="active" type="button" data-filter="Todos">
+            Todos
+          </button>
+          <button type="button" data-filter="Feriado">Feriados</button>
+          <button type="button" data-filter="Historia">Historia</button>
+          <button type="button" data-filter="Cultural">Cultura</button>
+          <button type="button" data-filter="Conmemoración">
+            Conmemoraciones
+          </button>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="calendar" aria-label="Calendario anual chileno">
+        {% for month in months %}
+        <article class="month" id="{{ month.name|lower }}">
+          <h2>{{ month.name }}</h2>
+          <div class="events">
+            {% for event in month.events %}
+            <div
+              class="event {% if event.irrenunciable %}irrenunciable{% endif %}"
+              data-type="{{ event.type }}"
+            >
+              <div
+                class="day {% if event.day == 'Variable' %}variable{% endif %}"
+              >
+                {{ event.day }}
+              </div>
+              <div>
+                <h3>{{ event.title }}</h3>
+                <span class="badge">{{ event.type }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </article>
+        {% endfor %}
+      </section>
+
+      <p class="note">
+        Algunas fechas religiosas son movibles y pueden cambiar cada año. Los
+        feriados irrenunciables o trasladables también pueden depender de la
+        normativa vigente.
+      </p>
+    </main>
+
+    <script>
+      const buttons = document.querySelectorAll("[data-filter]");
+      const events = document.querySelectorAll(".event");
+      const months = document.querySelectorAll(".month");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const filter = button.dataset.filter;
+          buttons.forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+
+          events.forEach((event) => {
+            const matches =
+              filter === "Todos" || event.dataset.type.includes(filter);
+            event.hidden = !matches;
+          });
+
+          months.forEach((month) => {
+            const visibleEvents = month.querySelectorAll(
+              ".event:not([hidden])",
+            );
+            month.hidden = visibleEvents.length === 0;
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
