@@ -28,6 +28,7 @@ def make_event(
     event_type,
     scope=None,
     category=None,
+    is_holiday=False,
     irrenunciable=False,
     **extra,
 ):
@@ -38,6 +39,7 @@ def make_event(
         "type": event_type,
         "scope": scope,
         "category": category,
+        "is_holiday": is_holiday,
         "irrenunciable": irrenunciable,
     }
     event.update(extra)
@@ -58,6 +60,7 @@ def get_chilean_calendar(year):
             holiday.get("type"),
             scope=holiday.get("scope"),
             category=holiday.get("category"),
+            is_holiday=True,
             irrenunciable=holiday.get("irrenunciable", False),
         )
         months[holiday_date.month - 1]["events"].append(event)
