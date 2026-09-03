@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from django.core.cache import cache
 from django.shortcuts import render
 import requests
