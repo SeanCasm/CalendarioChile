@@ -1,283 +1,11 @@
+{% load static %}
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendario de Chile</title>
-    <style>
-      :root {
-        color-scheme: light;
-        --ink: #172033;
-        --muted: #667085;
-        --line: #d8dee8;
-        --paper: #f7f3ea;
-        --white: #fffefb;
-        --red: #c52233;
-        --blue: #1f5aa6;
-        --green: #2f7d5b;
-        --gold: #bc7a18;
-        --history: #6d4c9b;
-        --commemoration: #b65332;
-        --culture: #087b8a;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: var(--paper);
-        color: var(--ink);
-      }
-
-      header {
-        background: var(--white);
-        border-bottom: 1px solid var(--line);
-      }
-
-      .hero {
-        width: min(1120px, calc(100% - 32px));
-        margin: 0 auto;
-        padding: 36px 0 24px;
-      }
-
-      .flag-bar {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        height: 8px;
-        margin-bottom: 22px;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .flag-bar span:nth-child(1) {
-        background: var(--blue);
-      }
-      .flag-bar span:nth-child(2) {
-        background: var(--white);
-      }
-      .flag-bar span:nth-child(3) {
-        background: var(--red);
-      }
-
-      h1 {
-        margin: 0;
-        font-size: clamp(2rem, 5vw, 4.2rem);
-        line-height: 1;
-        letter-spacing: 0;
-      }
-
-      .subtitle {
-        max-width: 720px;
-        margin: 14px 0 0;
-        color: var(--muted);
-        font-size: 1.08rem;
-        line-height: 1.55;
-      }
-
-      .toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 24px;
-      }
-
-      button {
-        min-height: 40px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--white);
-        color: var(--ink);
-        cursor: pointer;
-        font-weight: 700;
-        padding: 0 14px;
-      }
-
-      button:hover,
-      button.active {
-        border-color: var(--blue);
-        background: var(--blue);
-        color: white;
-      }
-
-      main {
-        width: min(1120px, calc(100% - 32px));
-        margin: 0 auto;
-        padding: 28px 0 48px;
-      }
-
-      .calendar {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      .month {
-        background: var(--white);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .month h2 {
-        margin: 0;
-        padding: 16px;
-        border-bottom: 1px solid var(--line);
-        font-size: 1.2rem;
-        background: #edf4ff;
-      }
-
-      .events {
-        display: grid;
-        gap: 0;
-      }
-
-      .event {
-        display: grid;
-        grid-template-columns: 78px 1fr;
-        gap: 12px;
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .event[hidden] {
-        display: none;
-      }
-
-      .event:last-child {
-        border-bottom: 0;
-      }
-
-      .day {
-        min-height: 46px;
-        display: grid;
-        place-items: center;
-        border-radius: 8px;
-        background: #f0f6f3;
-        color: var(--green);
-        font-size: 1.35rem;
-        font-weight: 800;
-        text-align: center;
-      }
-
-      .day.variable {
-        font-size: 0.78rem;
-        line-height: 1.1;
-        padding: 0 6px;
-        background: #fff4df;
-        color: var(--gold);
-      }
-
-      .event h3 {
-        margin: 0 0 7px;
-        font-size: 1rem;
-        line-height: 1.25;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        min-height: 24px;
-        padding: 0 8px;
-        border-radius: 999px;
-        background: #f3f4f6;
-        color: var(--muted);
-        font-size: 0.78rem;
-        font-weight: 700;
-      }
-
-      .event.holiday .day,
-      .event.holiday .badge {
-        background: #fff0f1;
-        color: var(--red);
-      }
-
-      .event.category-historia,
-      .event.category-historico,
-      .event.category-historica {
-        border-left: 4px solid var(--history);
-        background: #fbf8ff;
-      }
-
-      .event.category-historia .day,
-      .event.category-historico .day,
-      .event.category-historica .day,
-      .event.category-historia .badge,
-      .event.category-historico .badge,
-      .event.category-historica .badge {
-        background: #efe7fa;
-        color: var(--history);
-      }
-
-      .event.category-conmemoracion,
-      .event.category-conmemorativo,
-      .event.category-conmemorativa {
-        border-left: 4px solid var(--commemoration);
-        background: #fff8f4;
-      }
-
-      .event.category-conmemoracion .day,
-      .event.category-conmemorativo .day,
-      .event.category-conmemorativa .day,
-      .event.category-conmemoracion .badge,
-      .event.category-conmemorativo .badge,
-      .event.category-conmemorativa .badge {
-        background: #ffe9df;
-        color: var(--commemoration);
-      }
-
-      .event.category-cultural {
-        border-left: 4px solid var(--culture);
-        background: #f1fbfc;
-      }
-
-      .event.category-cultural .day,
-      .event.category-cultural .badge {
-        background: #dff4f6;
-        color: var(--culture);
-      }
-
-      .event.irrenunciable {
-        box-shadow: inset -4px 0 0 var(--green);
-      }
-
-      .event.irrenunciable .badge::after {
-        content: "Irrenunciable";
-        margin-left: 6px;
-        padding-left: 6px;
-        border-left: 1px solid currentColor;
-      }
-
-      .note {
-        margin-top: 22px;
-        color: var(--muted);
-        font-size: 0.92rem;
-        line-height: 1.5;
-      }
-
-      @media (max-width: 900px) {
-        .calendar {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      @media (max-width: 620px) {
-        .hero {
-          padding-top: 24px;
-        }
-
-        .calendar {
-          grid-template-columns: 1fr;
-        }
-
-        .event {
-          grid-template-columns: 64px 1fr;
-          padding: 12px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}" />
   </head>
   <body>
     <header>
@@ -299,11 +27,41 @@
           <button type="button" data-filter="Conmemorativa">
             Conmemoraciones
           </button>
+          <a
+            class="calendar-action"
+            href="{% url 'google-calendar-connect' %}?popup=1"
+            data-google-calendar-connect
+          >
+            Añadir feriados a Google Calendar
+          </a>
+          <a
+            class="calendar-action danger"
+            href="{% url 'google-calendar-connect' %}?popup=1&amp;action=delete"
+            data-google-calendar-connect
+            data-confirm="Se eliminarán de Google Calendar todas las fechas añadidas por esta aplicación. ¿Deseas continuar?"
+          >
+            Eliminar fechas añadidas
+          </a>
         </div>
       </section>
     </header>
 
+    {% if messages %}
+    <ul class="messages" aria-live="polite" aria-atomic="true">
+      {% for message in messages %}
+      <li class="message {{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
     <main>
+      {% if calendar_unavailable %}
+      <p class="message error" role="alert">
+        No se pudieron cargar las fechas. Configura <code>DJANGO_API_URL</code>
+        con la URL completa de la API (por ejemplo,
+        <code>https://api.ejemplo.cl/api/v1/</code>).
+      </p>
+      {% endif %}
       <section class="calendar" aria-label="Calendario anual chileno">
         {% for month in months %}
         <article class="month" id="{{ month.name|lower }}">
@@ -362,6 +120,75 @@
             month.hidden = visibleEvents.length === 0;
           });
         });
+      });
+
+      document.querySelectorAll("[data-google-calendar-connect]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          if (link.dataset.confirm && !window.confirm(link.dataset.confirm)) return;
+
+          event.preventDefault();
+          const popup = window.open(
+            event.currentTarget.href,
+            "google-calendar-oauth",
+            "width=520,height=680,menubar=no,toolbar=no,location=yes,status=no",
+          );
+
+          // Si el navegador bloquea popups, el enlace sigue funcionando.
+          if (!popup) window.location.assign(event.currentTarget.href);
+        });
+      });
+
+      function dismissNotification(message) {
+        window.setTimeout(() => {
+          message.classList.add("is-dismissing");
+          message.addEventListener("transitionend", () => message.remove(), { once: true });
+        }, 5000);
+      }
+
+      function showNotification(text, level = "success") {
+        let container = document.querySelector(".messages");
+        if (!container) {
+          container = document.createElement("ul");
+          container.className = "messages";
+          container.setAttribute("aria-live", "polite");
+          container.setAttribute("aria-atomic", "true");
+          document.body.append(container);
+        }
+
+        const message = document.createElement("li");
+        message.className = `message ${level}`;
+        message.textContent = text;
+        container.append(message);
+        dismissNotification(message);
+      }
+
+      const receivedNotifications = new Set();
+      function receiveCalendarNotification(notification) {
+        if (
+          notification?.type !== "google-calendar-notification" ||
+          !notification.message ||
+          receivedNotifications.has(notification.id)
+        ) return;
+        receivedNotifications.add(notification.id);
+        showNotification(notification.message, notification.level);
+      }
+
+      document.querySelectorAll(".message").forEach((message) => {
+        dismissNotification(message);
+      });
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== window.location.origin) return;
+        receiveCalendarNotification(event.data);
+      });
+
+      window.addEventListener("storage", (event) => {
+        if (event.key !== "google-calendar-notification" || !event.newValue) return;
+        try {
+          receiveCalendarNotification(JSON.parse(event.newValue));
+        } catch (_) {
+          // Ignora valores inválidos que no provengan del popup de Calendar.
+        }
       });
     </script>
   </body>

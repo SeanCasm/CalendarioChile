@@ -8,6 +8,7 @@ Aplicacion web hecha con Django que muestra un calendario anual de fechas import
 - Agrupa las fechas por mes.
 - Destaca los feriados irrenunciables con una clase CSS especial.
 - Permite filtrar eventos desde la interfaz por tipo: todos, feriados, historia, cultura y conmemoraciones.
+- Permite añadir los feriados del año al calendario principal de Google del usuario.
 - Calcula automaticamente los feriados moviles asociados a Semana Santa segun el año.
 
 ## Como Funciona
@@ -117,6 +118,16 @@ Abrir en el navegador:
 ```txt
 http://127.0.0.1:8000/
 ```
+
+## Integración con Google Calendar
+
+La sincronización usa OAuth 2.0: el usuario autoriza una vez desde Google y la aplicación agrega los feriados del año actual a su calendario principal. No se guardan tokens; cada sincronización solicita una autorización temporal. Los eventos creados llevan una marca privada para no duplicarse en sincronizaciones posteriores.
+
+1. En Google Cloud Console, crea un cliente OAuth de tipo **Aplicación web** y habilita la API de Google Calendar.
+2. Agrega la URI de redirección autorizada, por ejemplo `http://127.0.0.1:8000/google-calendar/callback/`.
+3. Copia `.env.example` a `.env` y configura `GOOGLE_CALENDAR_CLIENT_ID`, `GOOGLE_CALENDAR_CLIENT_SECRET` y `GOOGLE_CALENDAR_REDIRECT_URI`.
+
+La URI indicada en `GOOGLE_CALENDAR_REDIRECT_URI` debe coincidir exactamente con la registrada en Google Cloud. En producción debe usar la URL HTTPS pública de la aplicación.
 
 ## Estructura del Proyecto
 

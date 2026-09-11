@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Google Calendar</title>
+  </head>
+  <body>
+    <p>Autorización completada. Esta ventana se cerrará.</p>
+    <script>
+      const notification = {
+        id: `${Date.now()}-${Math.random()}`,
+        type: "google-calendar-notification",
+        message: "{{ notification_message|escapejs }}",
+        level: "{{ notification_level|escapejs }}",
+      };
+
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          notification,
+          window.location.origin,
+        );
+      }
+      // Respaldo para navegadores que no entregan postMessage al cerrar un popup.
+      window.localStorage.setItem(
+        "google-calendar-notification",
+        JSON.stringify(notification),
+      );
+      window.setTimeout(() => window.close(), 150);
+    </script>
+  </body>
+</html>
