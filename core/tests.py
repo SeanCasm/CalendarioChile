@@ -14,6 +14,17 @@ class GoogleCalendarIntegrationTests(TestCase):
 
         self.assertRedirects(response, reverse("home"))
 
+    @patch.dict(
+        "os.environ",
+        {"GOOGLE_CALENDAR_CLIENT_ID": "client", "GOOGLE_CALENDAR_CLIENT_SECRET": "secret"},
+        clear=True,
+    )
+    @patch("core.views.get_holiday_events", return_value=[])
+    def test_connect_requires_a_valid_selected_date(self, holidays):
+        response = self.client.get(reverse("google-calendar-connect"))
+
+        self.assertRedirects(response, reverse("home"))
+
     @patch("core.views.requests.post")
     @patch("core.views.requests.get")
     @patch("core.views.get_holiday_events")
@@ -38,7 +49,7 @@ class GoogleCalendarIntegrationTests(TestCase):
         post.return_value = Mock()
 
         created, skipped = views.sync_holidays_to_google_calendar(
-            2026, {"Authorization": "Bearer token"}
+            2026, {"2026-09-18", "2026-09-19"}, {"Authorization": "Bearer token"}
         )
 
         self.assertEqual((created, skipped), (1, 1))

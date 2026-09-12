@@ -126,6 +126,15 @@ def get_holiday_events(year):
     ]
 
 
+def get_selected_holiday_events(year, selected_dates):
+    """Return only displayed holidays whose date was selected by the user."""
+    return [
+        event
+        for event in get_holiday_events(year)
+        if event["date"].isoformat() in selected_dates
+    ]
+
+
 def google_calendar_connect(request):
     client_id = os.getenv("GOOGLE_CALENDAR_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CALENDAR_CLIENT_SECRET")
@@ -140,8 +149,18 @@ def google_calendar_connect(request):
     action = request.GET.get("action", "sync")
     if action not in {"sync", "delete"}:
         action = "sync"
+    selected_dates = set(request.GET.getlist("date"))
+    year = date.today().year
+    if action == "sync":
+        valid_dates = {event["date"].isoformat() for event in get_holiday_events(year)}
+        selected_dates &= valid_dates
+        if not selected_dates:
+            messages.error(request, "Selecciona al menos un día para añadirlo a Google Calendar.")
+            return redirect("home")
+
     request.session["google_calendar_oauth_state"] = state
-    request.session["google_calendar_sync_year"] = date.today().year
+    request.session["google_calendar_sync_year"] = year
+    request.session["google_calendar_selected_dates"] = sorted(selected_dates)
     request.session["google_calendar_oauth_popup"] = request.GET.get("popup") == "1"
     request.session["google_calendar_action"] = action
     query = urlencode(
@@ -203,7 +222,8 @@ def google_calendar_callback(request):
             return finish(f"Días eliminados: {deleted}.", "success")
 
         year = request.session.pop("google_calendar_sync_year", date.today().year)
-        created, skipped = sync_holidays_to_google_calendar(year, headers)
+        selected_dates = set(request.session.pop("google_calendar_selected_dates", []))
+        created, skipped = sync_holidays_to_google_calendar(year, selected_dates, headers)
     except requests.RequestException:
         return finish("No fue posible sincronizar los feriados con Google Calendar.", "error")
 
@@ -213,8 +233,8 @@ def google_calendar_callback(request):
     )
 
 
-def sync_holidays_to_google_calendar(year, headers):
-    """Create missing Chilean holidays in the user's primary Google calendar."""
+def sync_holidays_to_google_calendar(year, selected_dates, headers):
+    """Create selected Chilean holidays in the user's primary Google calendar."""
     start = date(year, 1, 1)
     end = date(year + 1, 1, 1)
     response = requests.get(
@@ -235,7 +255,7 @@ def sync_holidays_to_google_calendar(year, headers):
     }
 
     created = skipped = 0
-    for event in get_holiday_events(year):
+    for event in get_selected_holiday_events(year, selected_dates):
         source_id = f"{event['date'].isoformat()}:{event['title']}"
         if source_id in existing_ids:
             skipped += 1

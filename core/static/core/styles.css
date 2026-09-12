@@ -1,17 +1,21 @@
 :root {
   color-scheme: light;
-  --ink: #172033;
-  --muted: #667085;
-  --line: #d8dee8;
-  --paper: #f7f3ea;
-  --white: #fffefb;
-  --red: #c52233;
-  --blue: #1f5aa6;
-  --green: #2f7d5b;
-  --gold: #bc7a18;
-  --history: #6d4c9b;
-  --commemoration: #b65332;
-  --culture: #087b8a;
+  --ink: #17243a;
+  --muted: #64748b;
+  --line: #dce4ef;
+  --paper: #f3f6fa;
+  --white: #ffffff;
+  --red: #bd2636;
+  --blue: #173f77;
+  --blue-bright: #2463ad;
+  --green: #17745d;
+  --gold: #a96b14;
+  --history: #715a9f;
+  --commemoration: #ae5839;
+  --culture: #087d87;
+  --shadow-sm: 0 2px 5px rgb(23 36 58 / 5%);
+  --shadow-md: 0 12px 30px rgb(23 36 58 / 9%);
+  --shadow-lg: 0 22px 46px rgb(23 36 58 / 14%);
 }
 
 * { box-sizing: border-box; }
@@ -19,28 +23,32 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: var(--paper);
+  background:
+    radial-gradient(circle at 100% 0, rgb(219 232 249 / 72%), transparent 31rem),
+    var(--paper);
   color: var(--ink);
 }
 
 header {
-  background: var(--white);
+  background: rgb(255 255 255 / 88%);
   border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
 }
 
 .hero {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 36px 0 24px;
+  padding: 40px 0 28px;
 }
 
 .flag-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  height: 8px;
-  margin-bottom: 22px;
-  border-radius: 8px;
+  height: 9px;
+  margin-bottom: 25px;
+  border-radius: 999px;
   overflow: hidden;
+  box-shadow: 0 3px 8px rgb(23 63 119 / 15%);
 }
 
 .flag-bar span:nth-child(1) { background: var(--blue); }
@@ -51,21 +59,21 @@ h1 {
   margin: 0;
   font-size: clamp(2rem, 5vw, 4.2rem);
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: -0.045em;
 }
 
 .subtitle {
   max-width: 720px;
   margin: 14px 0 0;
   color: var(--muted);
-  font-size: 1.08rem;
+  font-size: 1.04rem;
   line-height: 1.55;
 }
 
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 9px;
   margin-top: 24px;
 }
 
@@ -73,15 +81,22 @@ h1 {
   display: inline-flex;
   align-items: center;
   min-height: 40px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--green);
   color: white;
   font-weight: 700;
-  padding: 0 14px;
+  padding: 0 16px;
   text-decoration: none;
+  box-shadow: 0 4px 10px rgb(23 116 93 / 18%);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
-.calendar-action:hover { background: #236447; }
+.calendar-action:hover { background: #125e4b; transform: translateY(-1px); box-shadow: 0 8px 18px rgb(23 116 93 / 24%); }
+.calendar-action:focus-visible { outline: 3px solid rgb(36 99 173 / 28%); outline-offset: 3px; }
+
+button.calendar-action { border: 0; }
+button.calendar-action:disabled { background: #9aa6a1; box-shadow: none; cursor: not-allowed; }
+button.calendar-action:disabled:hover { transform: none; }
 
 .calendar-action.danger { background: #9b1c2c; }
 .calendar-action.danger:hover { background: #7e1523; }
@@ -103,10 +118,11 @@ h1 {
 .message {
   pointer-events: auto;
   padding: 12px 16px;
-  border-radius: 8px;
+  border: 1px solid rgb(23 116 93 / 12%);
+  border-radius: 12px;
   background: #e8f6ee;
   color: #185c3a;
-  box-shadow: 0 12px 30px rgb(23 32 51 / 18%);
+  box-shadow: var(--shadow-lg);
   animation: notification-enter 180ms ease-out;
   transition: opacity 180ms ease, transform 180ms ease;
 }
@@ -122,57 +138,83 @@ h1 {
 button {
   min-height: 40px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--white);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 82%);
   color: var(--ink);
   cursor: pointer;
   font-weight: 700;
-  padding: 0 14px;
+  padding: 0 15px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 button:hover,
 button.active {
   border-color: var(--blue);
-  background: var(--blue);
+  background: var(--blue-bright);
   color: white;
+  box-shadow: 0 7px 15px rgb(36 99 173 / 22%);
+  transform: translateY(-1px);
 }
+
+button:focus-visible,
+input:focus-visible { outline: 3px solid rgb(36 99 173 / 28%); outline-offset: 2px; }
 
 main {
   width: min(1120px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 28px 0 48px;
+  padding: 32px 0 56px;
 }
 
 .calendar {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .month {
   background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 15px;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.month:hover { border-color: #c7d6e8; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.month-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(135deg, #eef5ff, #f7faff);
 }
 
 .month h2 {
   margin: 0;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
   font-size: 1.2rem;
-  background: #edf4ff;
 }
+
+.select-month { display: inline-flex; align-items: center; gap: 7px; color: var(--blue); font-size: .82rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
 
 .events { display: grid; gap: 0; }
 
 .event {
   display: grid;
-  grid-template-columns: 78px 1fr;
+  grid-template-columns: 20px 58px 1fr;
   gap: 12px;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #e7edf4;
+  cursor: pointer;
+  transition: background 160ms ease, box-shadow 160ms ease;
 }
+
+.event:hover { background: #f7faff; }
+.event:has(.select-event:checked) { background: #edf5ff; box-shadow: inset 3px 0 0 var(--blue-bright); }
+.select-event { align-self: center; width: 18px; height: 18px; margin: 0; accent-color: var(--blue); cursor: pointer; }
 
 .event[hidden] { display: none; }
 .event:last-child { border-bottom: 0; }
@@ -181,7 +223,7 @@ main {
   min-height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #f0f6f3;
   color: var(--green);
   font-size: 1.35rem;
@@ -204,6 +246,7 @@ main {
   align-items: center;
   min-height: 24px;
   padding: 0 8px;
+  border: 1px solid rgb(100 116 139 / 11%);
   border-radius: 999px;
   background: #f3f4f6;
   color: var(--muted);
@@ -264,6 +307,6 @@ main {
 @media (max-width: 620px) {
   .hero { padding-top: 24px; }
   .calendar { grid-template-columns: 1fr; }
-  .event { grid-template-columns: 64px 1fr; padding: 12px; }
+  .event { grid-template-columns: 20px 50px 1fr; padding: 12px; }
   .messages { right: 16px; bottom: 16px; }
 }

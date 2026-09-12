@@ -27,13 +27,9 @@
           <button type="button" data-filter="Conmemorativa">
             Conmemoraciones
           </button>
-          <a
-            class="calendar-action"
-            href="{% url 'google-calendar-connect' %}?popup=1"
-            data-google-calendar-connect
-          >
-            Añadir feriados a Google Calendar
-          </a>
+          <button class="calendar-action" type="button" data-add-selected disabled>
+            Añadir días seleccionados a Google Calendar
+          </button>
           <a
             class="calendar-action danger"
             href="{% url 'google-calendar-connect' %}?popup=1&amp;action=delete"
@@ -65,13 +61,25 @@
       <section class="calendar" aria-label="Calendario anual chileno">
         {% for month in months %}
         <article class="month" id="{{ month.name|lower }}">
-          <h2>{{ month.name }}</h2>
+          <div class="month-heading">
+            <h2>{{ month.name }}</h2>
+            <label class="select-month">
+              <input type="checkbox" data-select-month />
+              Mes completo
+            </label>
+          </div>
           <div class="events">
             {% for event in month.events %}
-            <div
+            <label
               class="event category-{{ event.category|default:''|slugify }} {% if event.is_holiday %}holiday{% endif %} {% if event.irrenunciable %}irrenunciable{% endif %}"
               data-type="{{ event.category }}"
             >
+              <input
+                class="select-event"
+                type="checkbox"
+                value="{{ event.date|date:'Y-m-d' }}"
+                aria-label="Seleccionar {{ event.title }}"
+              />
               <div
                 class="day {% if event.day == 'Variable' %}variable{% endif %}"
               >
@@ -81,7 +89,7 @@
                 <h3>{{ event.title }}</h3>
                 <span class="badge">{{ event.category }}</span>
               </div>
-            </div>
+            </label>
             {% endfor %}
           </div>
         </article>
@@ -99,6 +107,8 @@
       const buttons = document.querySelectorAll("[data-filter]");
       const events = document.querySelectorAll(".event");
       const months = document.querySelectorAll(".month");
+      const addSelectedButton = document.querySelector("[data-add-selected]");
+      const googleCalendarConnectUrl = "{% url 'google-calendar-connect' %}";
 
       buttons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -121,6 +131,49 @@
           });
         });
       });
+
+      function updateSelectionControls() {
+        const selectedEvents = document.querySelectorAll(".select-event:checked");
+        addSelectedButton.disabled = selectedEvents.length === 0;
+
+        months.forEach((month) => {
+          const eventInputs = month.querySelectorAll(".select-event");
+          const monthInput = month.querySelector("[data-select-month]");
+          const selectedCount = month.querySelectorAll(".select-event:checked").length;
+          monthInput.checked = eventInputs.length > 0 && selectedCount === eventInputs.length;
+          monthInput.indeterminate = selectedCount > 0 && selectedCount < eventInputs.length;
+        });
+      }
+
+      document.querySelectorAll(".select-event").forEach((input) => {
+        input.addEventListener("change", updateSelectionControls);
+      });
+
+      document.querySelectorAll("[data-select-month]").forEach((input) => {
+        input.addEventListener("change", () => {
+          input.closest(".month").querySelectorAll(".select-event").forEach((eventInput) => {
+            eventInput.checked = input.checked;
+          });
+          updateSelectionControls();
+        });
+      });
+
+      addSelectedButton.addEventListener("click", () => {
+        const selectedDates = [...new Set(
+          [...document.querySelectorAll(".select-event:checked")].map((input) => input.value),
+        )];
+        const params = new URLSearchParams({ popup: "1" });
+        selectedDates.forEach((selectedDate) => params.append("date", selectedDate));
+        const url = `${googleCalendarConnectUrl}?${params}`;
+        const popup = window.open(
+          url,
+          "google-calendar-oauth",
+          "width=520,height=680,menubar=no,toolbar=no,location=yes,status=no",
+        );
+        if (!popup) window.location.assign(url);
+      });
+
+      updateSelectionControls();
 
       document.querySelectorAll("[data-google-calendar-connect]").forEach((link) => {
         link.addEventListener("click", (event) => {
